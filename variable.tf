@@ -45,7 +45,7 @@ variable "ami_id2" {
 
 variable "instance_type" {
     description = "choose instance type"
-    default = "t2.micro"
+    default = "t2.medium"
 }
 
 
