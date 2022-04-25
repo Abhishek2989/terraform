@@ -65,63 +65,36 @@ resource "aws_route_table_association" "public_test" {
   route_table_id = aws_route_table.route_table_test.id
 }
 
-# Create Security Group for Public ALB Security Group 
 
-resource "aws_security_group" "ELB_Security_Group" {
-  name        = "ELB_Security_Group"
-  description = "Allow inbound 80,443"
-  vpc_id      = aws_vpc.test-vpc.id
-
-  ingress {
-    description      = "HTTPS"
-    from_port        = 443
-    to_port          = 443
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description      = "HTTP"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
-#   ipv6_cidr_blocks = ["::/0"]
-  }
-
-  tags = {
-    Name = "ELBSecurityGroup"
-	produt = "demo-security-group-elb"
-  }
-}
 
 # Create Security Group for Instances 
 
 resource "aws_security_group" "Allow_Web_Traffic" {
   name        = "EC2SecurityGroup"
-  description = "Allow inbound 22,80,443"
+  description = "Allow inbound 22,8081,9000,8080"
   vpc_id      = aws_vpc.test-vpc.id
 
   ingress {
-    description      = "HTTPS"
-    from_port        = 443
-    to_port          = 443
+    description      = "Sonarqube"
+    from_port        = 9000
+    to_port          = 9000
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
-#	security_groups = [aws_security_group.ELB_Security_Group.id]
+
   }
 
   ingress {
-    description      = "HTTP"
-    from_port        = 80
-    to_port          = 80
+    description      = "Nexus"
+    from_port        = 8081
+    to_port          = 8081
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+#   security_groups = [aws_security_group.ELB_Security_Group.id]
+  }
+  ingress {
+    description      = "Tomcat"
+    from_port        = 8080
+    to_port          = 8080
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
 #   security_groups = [aws_security_group.ELB_Security_Group.id]
@@ -198,67 +171,5 @@ resource "aws_instance" "ApplicationServer" {
   tags = {
     product = "demo-ec2"
 	Name = "ApplicationServer"
-  }
-}
-
-
-
-# Create ALB #
-
-resource "aws_lb" "Web_ALB" {
-  name               = "Web-ALB"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.ELB_Security_Group.id]
-  subnets            = [aws_subnet.subnet_dev.id, aws_subnet.subnet_prod.id]         # aws_subnet.public.*.id
-
-  enable_deletion_protection = false
-
-  tags = {
-    Name = "Web-ALB"
-	product = "demoELB"
-  }
-}
-
-# Create Target Group #
-
-resource "aws_lb_target_group" "ELB_Target_Group" {
-  name     = "ELB-Target-Group"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = aws_vpc.test-vpc.id
-  
-
- # Alter the destination of the health check to be the login page.
-  
-  health_check {
-    path = "/"
-    port = 80
-    healthy_threshold   = 3
-    unhealthy_threshold = 5
-    timeout             = 10
-#    target              = "HTTP:80/"
-    interval            = 30
-    protocol            = "HTTP"
-
-  }
-
-}
-
-# Create Listeners HTTP/HTTPS#
-
-resource "aws_lb_listener" "WEB_ELB_Listener_HTTP" {
-  load_balancer_arn = aws_lb.Web_ALB.arn
-  port              = "80"
-  protocol          = "HTTP"
-  
-    default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
   }
 }
