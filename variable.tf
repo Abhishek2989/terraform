@@ -32,20 +32,20 @@ variable "keyname" {
     description = "key name"
     default = "web-key"
 }
-variable "ami_id1" {
+variable "ami_id" {
     description = "ami id for amazon web server"
-    default = "ami-0c007898ce5ad0542"
-
-}
-variable "ami_id2" {
-    description = "ami id for amazon web server"
-    default = "ami-01b2f3429fe549410"
+    default = "ami-0e472ba40eb589f49"
 
 }
 
-variable "instance_type" {
+
+variable "Sonarqube_Nexus" {
     description = "choose instance type"
-    default = "t2.medium"
+    default = "t3a.medium"
+}
+variable "Application" {
+    description = "choose instance type"
+    default = "t2.micro"
 }
 
 
