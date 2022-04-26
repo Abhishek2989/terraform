@@ -147,23 +147,23 @@ output "private_key_webus" {
 }
 
 #Creation of EC2 instance
-resource "aws_instance" "AnsibleServer" {
-  ami = var.ami_id1
-  instance_type = var.instance_type
+resource "aws_instance" "SonarqubeNexusServer" {
+  ami = var.ami_id
+  instance_type = var.Sonarqube_Nexus
   key_name = var.keyname
   security_groups = [aws_security_group.Allow_Web_Traffic.id]
   subnet_id = aws_subnet.subnet_dev.id
 
   tags = {
     product = "demo-ec2"
-	Name = "AnsibleServer"
+	Name = "SonarqubeNexusServer"
   }
 }
 
 #Creation of ansible EC2 instance
 resource "aws_instance" "ApplicationServer" {
-  ami = var.ami_id2
-  instance_type = var.instance_type
+  ami = var.ami_id
+  instance_type = var.Application
   key_name = var.keyname
   security_groups = [aws_security_group.Allow_Web_Traffic.id]
   subnet_id = aws_subnet.subnet_dev.id
@@ -173,3 +173,7 @@ resource "aws_instance" "ApplicationServer" {
 	Name = "ApplicationServer"
   }
 }
+
+
+
+
